@@ -1,0 +1,51 @@
+
+syntax = "proto3";
+
+option go_package = "github.com/HanFa/learn-go/grpc-example/route";
+
+package route;
+
+message Point {
+  int32 latitude = 1; //此处的=右侧的数字代表键值对的key，能够压缩长度，节约流量，要从1开
+  int32 longitude = 2;
+}
+
+message Rectangle {
+  Point lo = 1;
+  Point hi = 2;
+}
+
+message Feature {
+  string name = 1;
+  Point location = 2;
+}
+
+message RouteSummary {
+  int32 point_count = 1;
+  int32 distance = 2;
+  int32 elapsed_time = 3;
+}
+
+enum RecommendationMode {
+  GetFarthest = 0; //enum从0开始
+  GetNearest = 1;
+}
+message RecommendationRequest {
+    RecommendationMode mode = 1;
+    Point point = 2;
+}
+
+service RouteGuide {
+  // unary 及时的通信，点与点
+  rpc GetFeature(Point) returns (Feature) {}
+
+  // server side streaming
+  rpc ListFeature(Rectangle) returns (stream Feature) {}
+
+  //client side streaming
+  rpc RecordRoute(stream Point) returns (RouteSummary) {}
+
+  // bidirectional streaming
+  rpc Recommend(stream RecommendationRequest) returns (stream Feature) {}
+
+}
